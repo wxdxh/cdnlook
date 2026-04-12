@@ -8,7 +8,6 @@ env/
 .DS_Store
 *.csv
 *.json
-!gcp_ranges.json
 network-tools.tgz
 frontend.zip
 google-cloud-cli-*.tar.gz

@@ -6,10 +6,17 @@ import os
 import sys
 import argparse
 import bisect
+import ssl
+
+import certifi
 
 # URL for Google's published IP ranges
 GCP_IP_RANGES_URL = "https://www.gstatic.com/ipranges/cloud.json"
 CACHE_FILE = "gcp_ranges.json"
+
+
+def build_ssl_context():
+    return ssl.create_default_context(cafile=certifi.where())
 
 def fetch_gcp_ranges():
     if os.path.exists(CACHE_FILE):
@@ -23,7 +30,7 @@ def fetch_gcp_ranges():
     print("Fetching Google Cloud IP ranges...")
     try:
         req = urllib.request.Request(GCP_IP_RANGES_URL)
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, context=build_ssl_context(), timeout=10) as response:
             data = json.loads(response.read().decode())
             
         with open(CACHE_FILE, 'w') as f:
@@ -31,8 +38,7 @@ def fetch_gcp_ranges():
             
         return data
     except Exception as e:
-        print(f"Error fetching GCP ranges: {e}")
-        sys.exit(1)
+        raise RuntimeError(f"Error fetching GCP ranges: {e}") from e
 
 def build_ip_index(data):
     """
@@ -81,82 +87,77 @@ def process_csv(input_file, output_file, ip_col='ip'):
     starts, ranges = build_ip_index(ranges_data)
     
     print(f"Reading from {input_file}...")
-    try:
-        header_row = None
-        header_idx = -1
-        col_idx = -1
-        
-        # Pass 1: find header
-        with open(input_file, 'r', encoding='utf-8', newline='') as f_in:
-            reader = csv.reader(f_in)
-            for i, row in enumerate(reader):
-                if not row:
-                    continue
-                try:
-                    col_idx = row.index(ip_col)
+    header_row = None
+    header_idx = -1
+    col_idx = -1
+    
+    # Pass 1: find header
+    with open(input_file, 'r', encoding='utf-8', newline='') as f_in:
+        reader = csv.reader(f_in)
+        for i, row in enumerate(reader):
+            if not row:
+                continue
+            try:
+                col_idx = row.index(ip_col)
+                header_row = row
+                header_idx = i
+                break
+            except ValueError:
+                lower_row = [str(r).lower() for r in row]
+                if ip_col.lower() in lower_row:
+                    col_idx = lower_row.index(ip_col.lower())
                     header_row = row
+                    ip_col = header_row[col_idx]
                     header_idx = i
+                    print(f"Warning: Exact column '{ip_col}' not found. Using '{header_row[col_idx]}' instead.")
                     break
-                except ValueError:
-                    lower_row = [str(r).lower() for r in row]
-                    if ip_col.lower() in lower_row:
-                        col_idx = lower_row.index(ip_col.lower())
-                        header_row = row
-                        ip_col = header_row[col_idx]
-                        header_idx = i
-                        print(f"Warning: Exact column '{ip_col}' not found. Using '{header_row[col_idx]}' instead.")
-                        break
-                        
-            if header_row is None:
-                print(f"Error: Could not find '{ip_col}' column in the file.")
-                sys.exit(1)
-        
-        # Pass 2: process
-        with open(input_file, 'r', encoding='utf-8', newline='') as f_in, \
-             open(output_file, 'w', encoding='utf-8', newline='') as f_out:
-             
-            reader = csv.reader(f_in)
-            writer = csv.writer(f_out)
-            
-            # Skip until header
-            for _ in range(header_idx):
-                next(reader)
-                
-            header = next(reader)
-            writer.writerow(header + ['is_gcp', 'is_global'])
-            
-            count = 0
-            gcp_count = 0
-            global_count = 0
-            
-            for row in reader:
-                if not row:
-                    continue
                     
-                is_gcp = False
-                is_global = False
-                if len(row) > col_idx:
-                    is_gcp, is_global = is_gcp_ip(row[col_idx], starts, ranges)
-                
-                writer.writerow(row + [str(is_gcp), str(is_global)])
-                
-                if is_gcp:
-                    gcp_count += 1
-                if is_global:
-                    global_count += 1
-                count += 1
-                
-                if count % 50000 == 0:
-                    print(f"Processed {count} rows...", flush=True)
-                    
-        print(f"Done! Processed {count} rows. Found {gcp_count} GCP IPs ({global_count} Global).")
-        print(f"Output written to {output_file}")
+        if header_row is None:
+            raise ValueError(f"Could not find '{ip_col}' column in the file.")
+    
+    # Pass 2: process
+    with open(input_file, 'r', encoding='utf-8', newline='') as f_in, \
+         open(output_file, 'w', encoding='utf-8', newline='') as f_out:
+         
+        reader = csv.reader(f_in)
+        writer = csv.writer(f_out)
         
-    except Exception as e:
-        print(f"Error processing file: {e}")
-        sys.exit(1)
+        # Skip until header
+        for _ in range(header_idx):
+            next(reader)
+            
+        header = next(reader)
+        writer.writerow(header + ['is_gcp', 'is_global'])
+        
+        count = 0
+        gcp_count = 0
+        global_count = 0
+        
+        for row in reader:
+            if not row:
+                continue
+                
+            is_gcp = False
+            is_global = False
+            if len(row) > col_idx:
+                is_gcp, is_global = is_gcp_ip(row[col_idx], starts, ranges)
+            
+            writer.writerow(row + [str(is_gcp), str(is_global)])
+            
+            if is_gcp:
+                gcp_count += 1
+            if is_global:
+                global_count += 1
+            count += 1
+            
+            if count % 50000 == 0:
+                print(f"Processed {count} rows...", flush=True)
+                
+    print(f"Done! Processed {count} rows. Found {gcp_count} GCP IPs ({global_count} Global).")
+    print(f"Output written to {output_file}")
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser(description="Check if IPs belong to Google Cloud.")
     parser.add_argument("input_file", help="Path to input CSV file")
     parser.add_argument("output_file", help="Path to output CSV file")
@@ -164,4 +165,13 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    process_csv(args.input_file, args.output_file, args.col)
+    try:
+        process_csv(args.input_file, args.output_file, args.col)
+    except Exception as e:
+        print(f"Error processing file: {e}")
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
