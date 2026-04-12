@@ -2,15 +2,9 @@ import argparse
 import sys
 import os
 
-# Import the main functions from the three scripts
-try:
-    import process_urls
-    import resolve_ips
-    import tag_gcp_ips
-except ImportError as e:
-    print(f"Error importing required modules: {e}")
-    print("Ensure process_urls.py, resolve_ips.py, and tag_gcp_ips.py are in the same directory.")
-    sys.exit(1)
+import process_urls
+import resolve_ips
+import tag_gcp_ips
 
 def run_pipeline(input_file, final_output_file, url_col='URL', workers=50, keep_temp=False):
     """ Orchestrates the pipeline """
@@ -45,8 +39,7 @@ def run_pipeline(input_file, final_output_file, url_col='URL', workers=50, keep_
 
     except Exception as e:
         print(f"\nPipeline failed during execution: {e}")
-        print("Intermediate files have been preserved for debugging.")
-        sys.exit(1)
+        raise RuntimeError(f"Pipeline failed during execution: {e}") from e
         
     finally:
         # Cleanup
@@ -64,7 +57,7 @@ def run_pipeline(input_file, final_output_file, url_col='URL', workers=50, keep_
             print(f"  Step 1: {step1_output}")
             print(f"  Step 2: {step2_output}")
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Integrated pipeline for processing URLs, resolving IPs, and tagging GCP.")
     parser.add_argument("input_file", help="Path to the initial input CSV file containing URLs.")
     parser.add_argument("output_file", help="Path to the final output CSV file.")
@@ -76,6 +69,15 @@ if __name__ == "__main__":
 
     if not os.path.exists(args.input_file):
         print(f"Error: Input file '{args.input_file}' does not exist.")
-        sys.exit(1)
+        return 1
 
-    run_pipeline(args.input_file, args.output_file, args.col, args.workers, args.keep_temp)
+    try:
+        run_pipeline(args.input_file, args.output_file, args.col, args.workers, args.keep_temp)
+    except Exception as e:
+        print(f"Error: {e}")
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

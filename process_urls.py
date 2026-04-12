@@ -22,66 +22,59 @@ def extract_host(url):
 
 def process_csv(input_file, output_file, url_col='url'):
     print(f"Reading from {input_file}...")
-    try:
-        with open(input_file, 'r', encoding='utf-8', newline='') as f_in:
-            reader = csv.reader(f_in)
+    with open(input_file, 'r', encoding='utf-8', newline='') as f_in:
+        reader = csv.reader(f_in)
+        
+        header = None
+        col_idx = -1
+        
+        for row in reader:
+            if not row:
+                continue
             
-            header = None
-            col_idx = -1
+            try:
+                col_idx = row.index(url_col)
+                header = row
+                break
+            except ValueError:
+                lower_row = [str(r).lower().strip() for r in row]
+                if url_col.lower() in lower_row:
+                    col_idx = lower_row.index(url_col.lower())
+                    header = row
+                    url_col = header[col_idx]
+                    print(f"Warning: Exact column '{url_col}' not found. Using '{header[col_idx]}' instead.")
+                    break
+        
+        if not header:
+            raise ValueError(f"Could not find '{url_col}' column in the file.")
+        
+        new_header = header + ['host']
+        
+        with open(output_file, 'w', encoding='utf-8', newline='') as f_out:
+            writer = csv.writer(f_out)
+            writer.writerow(new_header)
             
+            count = 0
             for row in reader:
                 if not row:
                     continue
                 
-                try:
-                    col_idx = row.index(url_col)
-                    header = row
-                    break
-                except ValueError:
-                    lower_row = [str(r).lower().strip() for r in row]
-                    if url_col.lower() in lower_row:
-                        col_idx = lower_row.index(url_col.lower())
-                        header = row
-                        url_col = header[col_idx]
-                        print(f"Warning: Exact column '{url_col}' not found. Using '{header[col_idx]}' instead.")
-                        break
-            
-            if not header:
-                print(f"Error: Could not find '{url_col}' column in the file.")
-                sys.exit(1)
-            
-            new_header = header + ['host']
-            
-            with open(output_file, 'w', encoding='utf-8', newline='') as f_out:
-                writer = csv.writer(f_out)
-                writer.writerow(new_header)
+                if len(row) <= col_idx:
+                    url_val = ''
+                else:
+                    url_val = row[col_idx]
                 
-                count = 0
-                for row in reader:
-                    # We might have empty rows in the data, just skip them or rewrite them?
-                    # The original code did: `if not row: continue`
-                    if not row:
-                        continue
-                    
-                    if len(row) <= col_idx:
-                        url_val = ''
-                    else:
-                        url_val = row[col_idx]
-                    
-                    host = extract_host(url_val)
-                    writer.writerow(row + [host])
-                    count += 1
-                    
-                    if count % 50000 == 0:
-                        print(f"Processed {count} rows...", flush=True)
+                host = extract_host(url_val)
+                writer.writerow(row + [host])
+                count += 1
+                
+                if count % 50000 == 0:
+                    print(f"Processed {count} rows...", flush=True)
 
-        print(f"Done! Processed {count} rows. Output written to {output_file}")
-        
-    except Exception as e:
-        print(f"Error processing file: {e}")
-        sys.exit(1)
+    print(f"Done! Processed {count} rows. Output written to {output_file}")
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser(description="Extract host from URLs in a CSV file (Standard Library).")
     parser.add_argument("input_file", help="Path to input CSV file")
     parser.add_argument("output_file", help="Path to output CSV file")
@@ -91,6 +84,15 @@ if __name__ == "__main__":
     
     if not os.path.exists(args.input_file):
         print(f"Error: Input file '{args.input_file}' does not exist.")
-        sys.exit(1)
-        
-    process_csv(args.input_file, args.output_file, args.col)
+        return 1
+
+    try:
+        process_csv(args.input_file, args.output_file, args.col)
+    except Exception as e:
+        print(f"Error processing file: {e}")
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

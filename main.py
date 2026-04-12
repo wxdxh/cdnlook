@@ -1,7 +1,7 @@
 import os
 import json
 import uuid
-from flask import Flask, request, render_template, jsonify, send_file
+from flask import Flask, request, render_template, jsonify, send_file, after_this_request
 from google.cloud import storage
 import dns.resolver
 import cdn_detector
@@ -13,6 +13,15 @@ app = Flask(__name__)
 
 # Required environment variable: GCS_OUTPUT_BUCKET
 OUTPUT_BUCKET_NAME = os.environ.get('GCS_OUTPUT_BUCKET')
+
+
+def cleanup_temp_files(*paths):
+    for path in paths:
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+            except OSError:
+                pass
 
 def resolve_dns(domain, server_ip=None):
     results = {
@@ -105,12 +114,7 @@ def process_file(bucket_name, file_name):
     finally:
         # 4. Clean up /tmp to avoid memory leaks
         # Cloud Run /tmp is RAM, so cleaning up is CRITICAL
-        for f in [local_input, local_output]:
-            if os.path.exists(f):
-                 try:
-                     os.remove(f)
-                 except:
-                     pass
+        cleanup_temp_files(local_input, local_output)
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
@@ -136,8 +140,9 @@ def root():
              return ("OK (Ignored)", 200)
              
         print(f"Received event for gs://{bucket_name}/{file_name}")
-        process_file(bucket_name, file_name)
-        
+        if not process_file(bucket_name, file_name):
+            return ("Processing failed", 500)
+
         return ("OK", 200)
     else:
         return render_template('index.html')
@@ -183,19 +188,17 @@ def process_uploaded_file():
             # Run pipeline
             workers = int(os.environ.get('DNS_WORKERS', 50))
             run_pipeline.run_pipeline(local_input, local_output, url_col=url_col, workers=workers, keep_temp=False)
-            
+
+            @after_this_request
+            def remove_temp_files(response):
+                cleanup_temp_files(local_input, local_output)
+                return response
+
             return send_file(local_output, as_attachment=True, download_name='processed_urls.csv')
             
         except Exception as e:
+            cleanup_temp_files(local_input, local_output)
             return jsonify({'error': str(e)}), 500
-        finally:
-            # Clean up
-            for f in [local_input, local_output]:
-                if os.path.exists(f):
-                    try:
-                        os.remove(f)
-                    except:
-                        pass
     else:
         return jsonify({'error': 'Invalid file type, only CSV allowed'}), 400
 
