@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+.pytest_cache/
+.DS_Store
+*.csv
+*.json
+!gcp_ranges.json
+network-tools.tgz
+frontend.zip
+google-cloud-cli-*.tar.gz
+python-*.pkg

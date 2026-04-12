@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Tools</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <button id="theme-toggle-btn" class="theme-toggle-btn">Switch to Light Mode</button>
+        </div>
+        <header>
+            <h1>Network Tools</h1>
+            <p>DNS Lookup and URL Processing Pipeline</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'dns-tab')">DNS Lookup</button>
+            <button class="tab-btn" onclick="openTab(event, 'pipeline-tab')">URL Pipeline</button>
+        </div>
+
+        <div id="dns-tab" class="tab-content active">
+            <div class="dns-server-selector">
+                <div class="dns-option active" data-value="default">Default DNS</div>
+                <div class="dns-option" data-value="google">Google DNS</div>
+                <div class="dns-option" data-value="cloudflare">Cloudflare DNS</div>
+                <div class="dns-option" data-value="kt">KT DNS</div>
+                <div class="dns-option" data-value="skb">SKB DNS</div>
+                <div class="dns-option" data-value="lgu">LGU+ DNS</div>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="domainInput" placeholder="Enter domain name (e.g., google.com)">
+                <button id="searchBtn">Find DNS records</button>
+            </div>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <span>Searching...</span>
+            </div>
+
+            <div id="results" class="results-container" style="display: none;">
+                <!-- Result cards will be inserted here -->
+            </div>
+        </div>
+
+        <div id="pipeline-tab" class="tab-content">
+            <div class="upload-box">
+                <h3>Upload CSV for Processing</h3>
+                <p>The CSV should contain a column named 'URL' (or specify below).</p>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="csvFile">Choose CSV File:</label>
+                        <input type="file" id="csvFile" name="file" accept=".csv" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="urlCol">URL Column Name:</label>
+                        <input type="text" id="urlCol" name="url_col" value="URL">
+                    </div>
+                    <button type="submit" id="uploadBtn">Process File</button>
+                </form>
+            </div>
+
+            <div id="pipeline-loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <span>Processing file... This may take a few minutes.</span>
+            </div>
+
+            <div id="pipeline-results" class="results-container" style="display: none;">
+                <div class="card" style="grid-column: 1 / -1;">
+                    <div class="card-header"><h3>Results</h3></div>
+                    <div class="card-body" id="pipeline-output">
+                        <!-- Download link will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Theme toggle
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const body = document.body;
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            body.classList.add('light-mode');
+            themeToggleBtn.textContent = 'Switch to Dark Mode';
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            if (body.classList.contains('light-mode')) {
+                localStorage.setItem('theme', 'light');
+                themeToggleBtn.textContent = 'Switch to Dark Mode';
+            } else {
+                localStorage.setItem('theme', 'dark');
+                themeToggleBtn.textContent = 'Switch to Light Mode';
+            }
+        });
+
+        // DNS option selection
+        document.querySelectorAll('.dns-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.dns-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.getElementById('searchBtn').addEventListener('click', performLookup);
+        document.getElementById('domainInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performLookup();
+            }
+        });
+
+        function performLookup() {
+            let domain = document.getElementById('domainInput').value.trim();
+            if (!domain) return;
+
+            // Parse domain from URL or string with port/path
+            try {
+                if (!domain.includes('://')) {
+                    domain = 'http://' + domain;
+                }
+                const url = new URL(domain);
+                domain = url.hostname;
+            } catch (e) {
+                // Fallback: just remove protocol, port and path with regex if URL parsing fails
+                domain = domain.replace(/^(https?:\/\/)?/, '')
+                               .split('/')[0]
+                               .split(':')[0];
+            }
+
+            // Update input with parsed domain
+            document.getElementById('domainInput').value = domain;
+
+            const activeOption = document.querySelector('.dns-option.active');
+            const server = activeOption ? activeOption.dataset.value : 'default';
+
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('results').innerHTML = '';
+
+            fetch(`/api/dns?domain=${encodeURIComponent(domain)}&server=${encodeURIComponent(server)}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('results').style.display = 'grid';
+
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
+
+                    renderResults(data);
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    showError('Failed to fetch DNS records.');
+                    console.error('Error:', error);
+                });
+        }
+
+        function renderResults(data) {
+            const container = document.getElementById('results');
+            
+            const recordTypes = ['A', 'AAAA', 'CNAME', 'TXT'];
+            
+            recordTypes.forEach(type => {
+                const records = data[type] || [];
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                const header = document.createElement('div');
+                header.className = 'card-header';
+                header.innerHTML = `<h3>${type} records</h3>`;
+                card.appendChild(header);
+                
+                const body = document.createElement('div');
+                body.className = 'card-body';
+                
+                if (records.length === 0) {
+                    body.innerHTML = `<p class="no-records">No ${type} records found.</p>`;
+                } else {
+                    const list = document.createElement('ul');
+                    records.forEach(r => {
+                        const li = document.createElement('li');
+                        if (type === 'A' || type === 'AAAA') {
+                            const ipSpan = document.createElement('span');
+                            ipSpan.textContent = r.ip;
+                            li.appendChild(ipSpan);
+                            
+                            if (r.provider) {
+                                const badge = document.createElement('span');
+                                let providerClass = r.provider.toLowerCase();
+                                if (providerClass.includes('google')) providerClass = 'google';
+                                else if (providerClass.includes('aws')) providerClass = 'aws';
+                                else if (providerClass.includes('cloudflare')) providerClass = 'cloudflare';
+                                else if (providerClass.includes('azure')) providerClass = 'azure';
+                                
+                                badge.className = `provider-badge ${providerClass}`;
+                                let badgeText = r.provider;
+                                if (r.detail) {
+                                    badgeText += ` (${r.detail})`;
+                                }
+                                badge.textContent = badgeText;
+                                li.appendChild(badge);
+                            }
+                        } else {
+                            li.textContent = r;
+                        }
+                        list.appendChild(li);
+                    });
+                    body.appendChild(list);
+                }
+                
+                card.appendChild(body);
+                container.appendChild(card);
+            });
+        }
+
+        function showError(message) {
+            const container = document.getElementById('results');
+            container.style.display = 'block';
+            container.innerHTML = `<div class="error-card">${message}</div>`;
+        }
+
+        // File upload handler
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            document.getElementById('pipeline-loading').style.display = 'flex';
+            document.getElementById('pipeline-results').style.display = 'none';
+            
+            fetch('/api/process', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                document.getElementById('pipeline-loading').style.display = 'none';
+                document.getElementById('pipeline-results').style.display = 'block';
+                
+                const url = window.URL.createObjectURL(blob);
+                document.getElementById('pipeline-output').innerHTML = `
+                    <p style="margin-bottom: 15px; color: #2d3748; font-weight: 600;">Processing complete!</p>
+                    <a href="${url}" download="processed_urls.csv" class="download-link">Download Processed CSV</a>
+                `;
+            })
+            .catch(error => {
+                document.getElementById('pipeline-loading').style.display = 'none';
+                document.getElementById('pipeline-results').style.display = 'block';
+                document.getElementById('pipeline-output').innerHTML = `<p class="error-card">Error: ${error.message}</p>`;
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
