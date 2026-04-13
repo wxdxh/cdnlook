@@ -42,6 +42,75 @@ body.light-mode {
     --shadow: 0 24px 64px rgba(102, 86, 61, 0.14);
 }
 
+body.light-mode .hero-visual {
+    color: var(--text);
+    border-color: rgba(96, 85, 71, 0.18);
+    background:
+        linear-gradient(180deg, rgba(255, 250, 243, 0.94), rgba(238, 228, 214, 0.96)),
+        radial-gradient(circle at top, rgba(17, 125, 124, 0.16), transparent 34%);
+}
+
+body.light-mode .hero-visual::before {
+    background-image:
+        linear-gradient(rgba(31, 39, 48, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 39, 48, 0.04) 1px, transparent 1px);
+}
+
+body.light-mode .radar-orbit {
+    border-color: rgba(17, 125, 124, 0.22);
+}
+
+body.light-mode .signal-node {
+    background: rgba(255, 251, 245, 0.92);
+    color: var(--text);
+    border-color: rgba(96, 85, 71, 0.18);
+    box-shadow: 0 12px 24px rgba(102, 86, 61, 0.08);
+}
+
+body.light-mode .visual-card {
+    background: rgba(255, 251, 245, 0.9);
+    border-color: rgba(96, 85, 71, 0.16);
+    box-shadow: 0 22px 40px rgba(102, 86, 61, 0.12);
+    color: var(--text);
+}
+
+body.light-mode .trace-row,
+body.light-mode .preview-list li {
+    border-top-color: rgba(96, 85, 71, 0.1);
+}
+
+body.light-mode .trace-row span,
+body.light-mode .preview-list span {
+    color: var(--text-soft);
+}
+
+body.light-mode .provider-badge.google,
+body.light-mode .provider-badge.google-cloud {
+    border-color: rgba(17, 125, 124, 0.3);
+    color: #0e6d6c;
+}
+
+body.light-mode .provider-badge.aws {
+    border-color: rgba(217, 118, 61, 0.28);
+    color: #b35f20;
+}
+
+body.light-mode .provider-badge.cloudflare {
+    border-color: rgba(47, 109, 164, 0.28);
+    color: #2f6da4;
+}
+
+body.light-mode .provider-badge.azure {
+    border-color: rgba(53, 111, 157, 0.28);
+    color: #356f9d;
+}
+
+body.light-mode .error-card {
+    border-color: rgba(201, 79, 54, 0.28);
+    background: rgba(201, 79, 54, 0.1);
+    color: #8d2f1d;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -55,8 +124,9 @@ html {
 body {
     min-height: 100vh;
     padding: 32px 18px 48px;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'IBM Plex Sans KR', sans-serif;
     color: var(--text);
+    line-height: 1.6;
     background:
         radial-gradient(circle at top left, rgba(26, 183, 209, 0.24), transparent 26%),
         radial-gradient(circle at 85% 14%, rgba(255, 156, 102, 0.16), transparent 22%),
@@ -77,20 +147,20 @@ body::after {
 body::before {
     top: 8%;
     left: 4%;
-    width: 220px;
-    height: 220px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(129, 231, 214, 0.14), transparent 72%);
+    background: radial-gradient(circle, rgba(129, 231, 214, 0.1), transparent 72%);
     filter: blur(8px);
 }
 
 body::after {
     right: 2%;
     bottom: 8%;
-    width: 280px;
-    height: 280px;
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 181, 109, 0.1), transparent 70%);
+    background: radial-gradient(circle, rgba(255, 181, 109, 0.08), transparent 70%);
     filter: blur(12px);
 }
 
@@ -159,7 +229,7 @@ body::after {
 .brand-copy strong {
     font-size: 1rem;
     font-weight: 700;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.01em;
     text-transform: uppercase;
 }
 
@@ -199,10 +269,10 @@ body::after {
 }
 
 .hero-panel {
-    padding: 34px;
+    padding: 30px;
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-    gap: 28px;
+    gap: 22px;
     overflow: hidden;
 }
 
@@ -219,23 +289,25 @@ body::after {
 .summary-label,
 .card-kicker,
 .success-tag {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'IBM Plex Sans KR', sans-serif;
     font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: none;
     color: var(--accent);
 }
 
 .hero-copy h1 {
-    font-size: clamp(2.5rem, 4vw, 4.4rem);
-    line-height: 0.95;
-    max-width: 12ch;
-    letter-spacing: -0.05em;
+    font-size: clamp(2.4rem, 4vw, 4rem);
+    line-height: 1.12;
+    max-width: 13ch;
+    letter-spacing: 0;
 }
 
 .hero-copy p {
-    max-width: 60ch;
-    font-size: 1.02rem;
+    max-width: 54ch;
+    font-size: 0.98rem;
+    line-height: 1.7;
     color: var(--text-soft);
 }
 
@@ -255,7 +327,7 @@ body::after {
 
 .metric-card strong {
     display: block;
-    font-size: 1.1rem;
+    font-size: 1.02rem;
     margin-bottom: 6px;
 }
 
@@ -266,7 +338,7 @@ body::after {
 
 .hero-visual {
     position: relative;
-    min-height: 420px;
+    min-height: 390px;
     border-radius: 28px;
     border: 1px solid var(--line);
     background:
@@ -353,7 +425,7 @@ body::after {
 .visual-primary h2 {
     margin: 10px 0 18px;
     font-size: 1.7rem;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.01em;
 }
 
 .trace-row {
@@ -407,15 +479,15 @@ body::after {
 }
 
 .intro-strip {
-    padding: 28px 30px 30px;
+    padding: 24px 28px 28px;
     display: grid;
-    gap: 22px;
+    gap: 18px;
 }
 
 .intro-copy h2 {
-    font-size: clamp(1.6rem, 2vw, 2.3rem);
+    font-size: clamp(1.5rem, 2vw, 2rem);
     margin: 8px 0 10px;
-    letter-spacing: -0.04em;
+    letter-spacing: 0;
 }
 
 .intro-copy p {
@@ -440,13 +512,14 @@ body::after {
 .intro-card h3 {
     margin: 10px 0 8px;
     font-size: 1.12rem;
-    letter-spacing: -0.03em;
+    letter-spacing: 0;
 }
 
 .intro-card p,
 .side-card p {
     color: var(--text-soft);
-    font-size: 0.95rem;
+    font-size: 0.92rem;
+    line-height: 1.65;
 }
 
 .tabs {
@@ -462,13 +535,13 @@ body::after {
 
 .tab-btn {
     border: none;
-    padding: 12px 20px;
+    padding: 11px 18px;
     border-radius: 999px;
     background: transparent;
     color: var(--text-soft);
     font: inherit;
     font-size: 0.92rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
@@ -493,7 +566,7 @@ body::after {
 }
 
 .tool-panel {
-    padding: 30px;
+    padding: 28px;
 }
 
 .panel-heading {
@@ -506,13 +579,15 @@ body::after {
 
 .panel-heading h3 {
     margin: 8px 0 8px;
-    font-size: clamp(1.5rem, 2vw, 2.2rem);
-    letter-spacing: -0.04em;
+    font-size: clamp(1.45rem, 2vw, 1.95rem);
+    letter-spacing: 0;
 }
 
 .panel-heading p {
     color: var(--text-soft);
-    max-width: 64ch;
+    max-width: 58ch;
+    font-size: 0.95rem;
+    line-height: 1.65;
 }
 
 .panel-note {
@@ -524,6 +599,7 @@ body::after {
     color: var(--text-soft);
     background: rgba(255, 255, 255, 0.03);
     white-space: nowrap;
+    font-size: 0.82rem;
 }
 
 .dns-server-selector {
@@ -560,11 +636,11 @@ body::after {
 }
 
 .dns-option-meta {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.74rem;
+    font-family: 'IBM Plex Sans KR', sans-serif;
+    font-size: 0.76rem;
     color: var(--text-soft);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .search-box {
@@ -591,7 +667,7 @@ body::after {
     color: var(--text);
     padding: 8px 10px;
     font: inherit;
-    font-size: 1rem;
+    font-size: 0.98rem;
 }
 
 .search-box input::placeholder {
@@ -607,7 +683,7 @@ body::after {
     color: #061c21;
     padding: 14px 22px;
     font: inherit;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     text-decoration: none;
     text-align: center;
@@ -631,7 +707,7 @@ body::after {
 
 .quick-label {
     color: var(--text-soft);
-    font-size: 0.88rem;
+    font-size: 0.84rem;
 }
 
 .sample-chip {
@@ -717,9 +793,9 @@ body::after {
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.04em;
+    font-family: 'IBM Plex Sans KR', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
 }
 
 .summary-provider {
@@ -749,7 +825,7 @@ body::after {
 .card-header h3 {
     margin-top: 6px;
     font-size: 1.2rem;
-    letter-spacing: -0.03em;
+    letter-spacing: 0;
 }
 
 .card-count {
@@ -860,12 +936,14 @@ code {
 .upload-box h3 {
     font-size: 1.5rem;
     margin-bottom: 10px;
-    letter-spacing: -0.03em;
+    letter-spacing: 0;
 }
 
 .upload-box p {
     color: var(--text-soft);
     margin-bottom: 24px;
+    font-size: 0.94rem;
+    line-height: 1.65;
 }
 
 .form-group {
