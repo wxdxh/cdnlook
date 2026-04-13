@@ -20,89 +20,6 @@
             <button id="theme-toggle-btn" class="theme-toggle-btn">라이트 보기</button>
         </div>
 
-        <section class="hero-panel">
-            <div class="hero-copy">
-                <span class="eyebrow">실시간 DNS 진단</span>
-                <h1>DNS 응답과 CDN 신호를 빠르게 정리하세요.</h1>
-                <p>
-                    리졸버별 응답을 비교하고, IP와 사업자 힌트를 한 화면에서 확인한 뒤, 필요하면 CSV로 확장 분석까지 이어갈 수 있습니다.
-                </p>
-                <div class="hero-metrics">
-                    <div class="metric-card">
-                        <strong>6</strong>
-                        <span>리졸버 옵션</span>
-                    </div>
-                    <div class="metric-card">
-                        <strong>A / AAAA</strong>
-                        <span>주소 응답 확인</span>
-                    </div>
-                    <div class="metric-card">
-                        <strong>CSV</strong>
-                        <span>결과 파일 내보내기</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="hero-visual" aria-hidden="true">
-                <div class="radar-orbit orbit-one"></div>
-                <div class="radar-orbit orbit-two"></div>
-                <div class="signal-node signal-seoul">서울</div>
-                <div class="signal-node signal-edge">엣지</div>
-                <div class="signal-node signal-origin">오리진</div>
-
-                <div class="visual-card visual-primary">
-                    <span class="visual-label">현재 추적</span>
-                    <h2>cdnlook.com</h2>
-                    <div class="trace-row">
-                        <span>리졸버</span>
-                        <strong>Cloudflare 1.1.1.1</strong>
-                    </div>
-                    <div class="trace-row">
-                        <span>엣지 사업자</span>
-                        <strong>Google Cloud</strong>
-                    </div>
-                    <div class="trace-row">
-                        <span>프로파일</span>
-                        <strong>글로벌 애니캐스트</strong>
-                    </div>
-                </div>
-
-                <div class="visual-card visual-secondary">
-                    <span class="visual-label">파이프라인 미리보기</span>
-                    <ul class="preview-list">
-                        <li><span>host</span><strong>example.com</strong></li>
-                        <li><span>ip</span><strong>104.20.23.154</strong></li>
-                        <li><span>is_gcp</span><strong>false</strong></li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section class="intro-strip">
-            <div class="intro-copy">
-                <span class="section-tag">워크스페이스 개요</span>
-                <h2>조회와 배치를 한 화면에서 처리합니다.</h2>
-                <p>빠른 확인은 DNS 탭에서, 대량 점검은 CSV 파이프라인에서 바로 이어집니다.</p>
-            </div>
-            <div class="intro-grid">
-                <article class="intro-card">
-                    <span class="intro-card-tag">리졸버 렌즈</span>
-                    <h3>공용 DNS와 국내 ISP 응답을 비교합니다.</h3>
-                    <p>기본, Google, Cloudflare, KT, SKB, LGU+를 빠르게 전환할 수 있습니다.</p>
-                </article>
-                <article class="intro-card">
-                    <span class="intro-card-tag">사업자 신호</span>
-                    <h3>IP 기반 사업자 신호를 바로 읽습니다.</h3>
-                    <p>A와 AAAA 응답에 Google Cloud, AWS, Cloudflare, Azure 힌트를 표시합니다.</p>
-                </article>
-                <article class="intro-card">
-                    <span class="intro-card-tag">배치 내보내기</span>
-                    <h3>CSV를 분석용 결과물로 바꿉니다.</h3>
-                    <p>호스트, IP, GCP 플래그가 추가된 파일을 바로 다운로드할 수 있습니다.</p>
-                </article>
-            </div>
-        </section>
-
         <div class="tabs">
             <button class="tab-btn active" onclick="openTab(event, 'dns-tab')" aria-selected="true">DNS 스튜디오</button>
             <button class="tab-btn" onclick="openTab(event, 'pipeline-tab')" aria-selected="false">파이프라인 내보내기</button>
@@ -114,7 +31,7 @@
                     <div>
                         <span class="section-tag">실시간 조회</span>
                         <h3>리졸버 비교 분석</h3>
-                        <p>도메인을 입력하고 원하는 DNS 경로를 선택하면, 응답과 사업자 힌트를 바로 확인할 수 있습니다.</p>
+                        <p>도메인과 리졸버를 선택하면 응답과 사업자 힌트를 바로 보여줍니다.</p>
                     </div>
                     <div class="panel-note">IPv4, IPv6, CNAME, TXT</div>
                 </div>
@@ -175,7 +92,7 @@
                     <div>
                         <span class="section-tag">배치 워크플로</span>
                         <h3>CSV 확장 파이프라인</h3>
-                        <p>URL 목록을 업로드하면 호스트와 IP 정보가 더해진 CSV를 바로 내려받을 수 있습니다.</p>
+                        <p>CSV에 host, IP, GCP 플래그를 덧붙여 다시 내려받습니다.</p>
                     </div>
                     <div class="panel-note">URL 컬럼명 변경 가능</div>
                 </div>
@@ -233,6 +150,64 @@
                 </div>
             </section>
         </div>
+
+        <section class="hero-panel support-panel">
+            <div class="hero-copy">
+                <span class="section-tag">워크스페이스 안내</span>
+                <h2>상단에서 바로 확인하고, 필요할 때만 아래 설명을 참고하세요.</h2>
+                <p>
+                    먼저 리졸버 비교로 응답 차이를 확인한 뒤, 대량 점검이 필요할 때만 CSV 파이프라인으로 확장하는 흐름에 맞춰 화면을 정리했습니다.
+                </p>
+                <div class="hero-metrics">
+                    <div class="metric-card">
+                        <strong>리졸버 비교</strong>
+                        <span>기본, Google, Cloudflare, KT, SKB, LGU+를 빠르게 전환합니다.</span>
+                    </div>
+                    <div class="metric-card">
+                        <strong>응답 해석</strong>
+                        <span>A, AAAA, CNAME, TXT와 사업자 힌트를 한 화면에서 확인합니다.</span>
+                    </div>
+                    <div class="metric-card">
+                        <strong>CSV 확장</strong>
+                        <span>대량 점검이 필요할 때만 host, IP, GCP 플래그를 덧붙여 내보냅니다.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual" aria-hidden="true">
+                <div class="radar-orbit orbit-one"></div>
+                <div class="radar-orbit orbit-two"></div>
+                <div class="signal-node signal-seoul">실시간 조회</div>
+                <div class="signal-node signal-edge">리졸버 비교</div>
+                <div class="signal-node signal-origin">CSV 확장</div>
+
+                <div class="visual-card visual-primary">
+                    <span class="visual-label">권장 흐름</span>
+                    <h2>도메인 확인 먼저</h2>
+                    <div class="trace-row">
+                        <span>1단계</span>
+                        <strong>응답 차이 확인</strong>
+                    </div>
+                    <div class="trace-row">
+                        <span>2단계</span>
+                        <strong>사업자 힌트 점검</strong>
+                    </div>
+                    <div class="trace-row">
+                        <span>3단계</span>
+                        <strong>필요 시 CSV 확장</strong>
+                    </div>
+                </div>
+
+                <div class="visual-card visual-secondary">
+                    <span class="visual-label">결과 예시</span>
+                    <ul class="preview-list">
+                        <li><span>resolver</span><strong>KT</strong></li>
+                        <li><span>record</span><strong>A / AAAA</strong></li>
+                        <li><span>provider</span><strong>Cloudflare</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
     </main>
 
     <script>
