@@ -21,17 +21,17 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" onclick="openTab(event, 'dns-tab')" aria-selected="true">DNS 스튜디오</button>
-            <button class="tab-btn" onclick="openTab(event, 'pipeline-tab')" aria-selected="false">파이프라인 내보내기</button>
+            <button class="tab-btn active" onclick="openTab(event, 'dns-tab')" aria-selected="true">DNS 조회</button>
+            <button class="tab-btn" onclick="openTab(event, 'pipeline-tab')" aria-selected="false">CSV 처리</button>
         </div>
 
         <div id="dns-tab" class="tab-content active">
             <section class="tool-panel">
                 <div class="panel-heading">
                     <div>
-                        <span class="section-tag">실시간 조회</span>
-                        <h3>리졸버 비교 분석</h3>
-                        <p>도메인과 리졸버를 선택하면 응답과 사업자 힌트를 바로 보여줍니다.</p>
+                        <span class="section-tag">DNS 조회</span>
+                        <h3>리졸버 비교</h3>
+                        <p>도메인별 DNS 응답과 IP 소속을 확인합니다.</p>
                     </div>
                     <div class="panel-note">IPv4, IPv6, CNAME, TXT</div>
                 </div>
@@ -90,17 +90,17 @@
             <section class="tool-panel">
                 <div class="panel-heading">
                     <div>
-                        <span class="section-tag">배치 워크플로</span>
-                        <h3>CSV 확장 파이프라인</h3>
-                        <p>CSV에 host, IP, GCP 플래그를 덧붙여 다시 내려받습니다.</p>
+                        <span class="section-tag">CSV 처리</span>
+                        <h3>CSV 확장</h3>
+                        <p>URL CSV에 <code>host</code>, <code>ip</code>, <code>is_gcp</code> 컬럼을 추가합니다.</p>
                     </div>
-                    <div class="panel-note">URL 컬럼명 변경 가능</div>
+                    <div class="panel-note">URL 컬럼 지정</div>
                 </div>
 
                 <div class="pipeline-layout">
                     <div class="upload-box">
                         <h3>CSV 업로드</h3>
-                        <p>파일에 URL 컬럼이 있어야 하며, 헤더명이 <code>URL</code>이 아니면 실제 컬럼명을 입력해 주세요.</p>
+                        <p>URL 컬럼이 필요합니다. 기본 컬럼명은 <code>URL</code>이며, 다른 이름도 직접 지정할 수 있습니다.</p>
                         <form id="uploadForm" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label for="csvFile">CSV 파일</label>
@@ -124,8 +124,12 @@
                             </ul>
                         </div>
                         <div class="side-card side-card-accent">
-                            <span class="intro-card-tag">추천 활용</span>
-                            <p>대규모 URL 점검이나 전달용 네트워크 정리 작업에 적합합니다.</p>
+                            <span class="intro-card-tag">입력 조건</span>
+                            <ul class="side-list">
+                                <li><span>1</span><p>URL 컬럼이 필요합니다.</p></li>
+                                <li><span>2</span><p>기본 컬럼명은 <code>URL</code>입니다.</p></li>
+                                <li><span>3</span><p>다른 컬럼명도 직접 입력할 수 있습니다.</p></li>
+                            </ul>
                         </div>
                     </aside>
                 </div>
@@ -151,61 +155,18 @@
             </section>
         </div>
 
-        <section class="hero-panel support-panel">
-            <div class="hero-copy">
-                <span class="section-tag">워크스페이스 안내</span>
-                <h2>상단에서 바로 확인하고, 필요할 때만 아래 설명을 참고하세요.</h2>
-                <p>
-                    먼저 리졸버 비교로 응답 차이를 확인한 뒤, 대량 점검이 필요할 때만 CSV 파이프라인으로 확장하는 흐름에 맞춰 화면을 정리했습니다.
-                </p>
-                <div class="hero-metrics">
-                    <div class="metric-card">
-                        <strong>리졸버 비교</strong>
-                        <span>기본, Google, Cloudflare, KT, SKB, LGU+를 빠르게 전환합니다.</span>
-                    </div>
-                    <div class="metric-card">
-                        <strong>응답 해석</strong>
-                        <span>A, AAAA, CNAME, TXT와 사업자 힌트를 한 화면에서 확인합니다.</span>
-                    </div>
-                    <div class="metric-card">
-                        <strong>CSV 확장</strong>
-                        <span>대량 점검이 필요할 때만 host, IP, GCP 플래그를 덧붙여 내보냅니다.</span>
-                    </div>
-                </div>
+        <section class="info-strip" aria-label="지원 정보">
+            <div class="info-item">
+                <span class="info-key">지원 레코드</span>
+                <p class="info-value">A, AAAA, CNAME, TXT</p>
             </div>
-
-            <div class="hero-visual" aria-hidden="true">
-                <div class="radar-orbit orbit-one"></div>
-                <div class="radar-orbit orbit-two"></div>
-                <div class="signal-node signal-seoul">실시간 조회</div>
-                <div class="signal-node signal-edge">리졸버 비교</div>
-                <div class="signal-node signal-origin">CSV 확장</div>
-
-                <div class="visual-card visual-primary">
-                    <span class="visual-label">권장 흐름</span>
-                    <h2>도메인 확인 먼저</h2>
-                    <div class="trace-row">
-                        <span>1단계</span>
-                        <strong>응답 차이 확인</strong>
-                    </div>
-                    <div class="trace-row">
-                        <span>2단계</span>
-                        <strong>사업자 힌트 점검</strong>
-                    </div>
-                    <div class="trace-row">
-                        <span>3단계</span>
-                        <strong>필요 시 CSV 확장</strong>
-                    </div>
-                </div>
-
-                <div class="visual-card visual-secondary">
-                    <span class="visual-label">결과 예시</span>
-                    <ul class="preview-list">
-                        <li><span>resolver</span><strong>KT</strong></li>
-                        <li><span>record</span><strong>A / AAAA</strong></li>
-                        <li><span>provider</span><strong>Cloudflare</strong></li>
-                    </ul>
-                </div>
+            <div class="info-item">
+                <span class="info-key">리졸버</span>
+                <p class="info-value">기본, Google, Cloudflare, KT, SKB, LGU+</p>
+            </div>
+            <div class="info-item">
+                <span class="info-key">CSV 출력</span>
+                <p class="info-value"><code>host</code>, <code>ip</code>, <code>is_gcp</code></p>
             </div>
         </section>
     </main>
