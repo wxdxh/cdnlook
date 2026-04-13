@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cdnlook | DNS 인텔리전스 워크스페이스</title>
+    <title>cdnlook | DNS 진단 워크스페이스</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <main class="shell">
@@ -14,7 +14,7 @@
                 <span class="brand-mark"></span>
                 <span class="brand-copy">
                     <strong>cdnlook</strong>
-                    <span>DNS 인텔리전스 워크스페이스</span>
+                    <span>DNS 진단 워크스페이스</span>
                 </span>
             </a>
             <button id="theme-toggle-btn" class="theme-toggle-btn">라이트 보기</button>
@@ -22,23 +22,23 @@
 
         <section class="hero-panel">
             <div class="hero-copy">
-                <span class="eyebrow">실시간 네트워크 진단</span>
-                <h1>DNS 응답을 읽고, 엣지 사업자를 파악하고, URL 목록을 보기 좋은 결과물로 정리하세요.</h1>
+                <span class="eyebrow">실시간 DNS 진단</span>
+                <h1>DNS 응답과 CDN 신호를 빠르게 정리하세요.</h1>
                 <p>
-                    cdnlook은 DNS 조회와 CSV 파이프라인을 하나의 화면으로 묶어, 빠른 점검도 더 정돈되고 공유하기 쉬운 조사 흐름으로 바꿔줍니다.
+                    리졸버별 응답을 비교하고, IP와 사업자 힌트를 한 화면에서 확인한 뒤, 필요하면 CSV로 확장 분석까지 이어갈 수 있습니다.
                 </p>
                 <div class="hero-metrics">
                     <div class="metric-card">
                         <strong>6</strong>
-                        <span>리졸버 프리셋</span>
+                        <span>리졸버 옵션</span>
                     </div>
                     <div class="metric-card">
-                        <strong>IPv4 + IPv6</strong>
-                        <span>병렬 가시성</span>
+                        <strong>A / AAAA</strong>
+                        <span>주소 응답 확인</span>
                     </div>
                     <div class="metric-card">
-                        <strong>CSV 결과</strong>
-                        <span>내보내기용 결과 파일</span>
+                        <strong>CSV</strong>
+                        <span>결과 파일 내보내기</span>
                     </div>
                 </div>
             </div>
@@ -81,24 +81,24 @@
         <section class="intro-strip">
             <div class="intro-copy">
                 <span class="section-tag">워크스페이스 개요</span>
-                <h2>두 개의 핵심 흐름을 하나의 세련된 인터페이스로 묶었습니다.</h2>
-                <p>빠른 확인이 필요할 때는 실시간 DNS 조회를, 더 넓은 URL 목록을 다룰 때는 배치 파이프라인을 사용해 바로 내려받을 수 있는 보고형 결과를 만드세요.</p>
+                <h2>조회와 배치를 한 화면에서 처리합니다.</h2>
+                <p>빠른 확인은 DNS 탭에서, 대량 점검은 CSV 파이프라인에서 바로 이어집니다.</p>
             </div>
             <div class="intro-grid">
                 <article class="intro-card">
                     <span class="intro-card-tag">리졸버 렌즈</span>
-                    <h3>공용 DNS와 국내 ISP 경로를 한 번에 비교합니다.</h3>
-                    <p>기본 DNS, Google, Cloudflare, 국내 ISP 리졸버를 화면 이동 없이 바로 교차 확인할 수 있습니다.</p>
+                    <h3>공용 DNS와 국내 ISP 응답을 비교합니다.</h3>
+                    <p>기본, Google, Cloudflare, KT, SKB, LGU+를 빠르게 전환할 수 있습니다.</p>
                 </article>
                 <article class="intro-card">
                     <span class="intro-card-tag">사업자 신호</span>
-                    <h3>가능성 높은 CDN 소유 관계를 빠르게 읽어냅니다.</h3>
-                    <p>A와 AAAA 응답에 클라우드 및 엣지 힌트를 덧붙여서, 중요한 패턴이 더 빨리 드러나도록 구성했습니다.</p>
+                    <h3>IP 기반 사업자 신호를 바로 읽습니다.</h3>
+                    <p>A와 AAAA 응답에 Google Cloud, AWS, Cloudflare, Azure 힌트를 표시합니다.</p>
                 </article>
                 <article class="intro-card">
                     <span class="intro-card-tag">배치 내보내기</span>
-                    <h3>업로드한 CSV를 바로 분석용 결과물로 바꿉니다.</h3>
-                    <p>호스트 추출, IP 확인, 결과 파일 다운로드까지 이어져서 공유나 후속 분석으로 바로 연결할 수 있습니다.</p>
+                    <h3>CSV를 분석용 결과물로 바꿉니다.</h3>
+                    <p>호스트, IP, GCP 플래그가 추가된 파일을 바로 다운로드할 수 있습니다.</p>
                 </article>
             </div>
         </section>
@@ -114,7 +114,7 @@
                     <div>
                         <span class="section-tag">실시간 조회</span>
                         <h3>리졸버 비교 분석</h3>
-                        <p>도메인을 정리해서 입력하고, 원하는 DNS 경로를 선택한 뒤, 네트워크 소유 힌트를 더 보기 쉬운 형태로 확인하세요.</p>
+                        <p>도메인을 입력하고 원하는 DNS 경로를 선택하면, 응답과 사업자 힌트를 바로 확인할 수 있습니다.</p>
                     </div>
                     <div class="panel-note">IPv4, IPv6, CNAME, TXT</div>
                 </div>
@@ -175,7 +175,7 @@
                     <div>
                         <span class="section-tag">배치 워크플로</span>
                         <h3>CSV 확장 파이프라인</h3>
-                        <p>URL 목록을 업로드하고 컬럼 이름을 유연하게 지정한 뒤, 호스트와 IP 정보가 더해진 처리 결과 CSV를 내려받을 수 있습니다.</p>
+                        <p>URL 목록을 업로드하면 호스트와 IP 정보가 더해진 CSV를 바로 내려받을 수 있습니다.</p>
                     </div>
                     <div class="panel-note">URL 컬럼명 변경 가능</div>
                 </div>
@@ -183,7 +183,7 @@
                 <div class="pipeline-layout">
                     <div class="upload-box">
                         <h3>CSV 업로드</h3>
-                        <p>파일에는 URL 컬럼이 포함되어야 합니다. 헤더명이 <code>URL</code>이 아니라면, 처리 전에 실제 컬럼명을 입력해 주세요.</p>
+                        <p>파일에 URL 컬럼이 있어야 하며, 헤더명이 <code>URL</code>이 아니면 실제 컬럼명을 입력해 주세요.</p>
                         <form id="uploadForm" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label for="csvFile">CSV 파일</label>
@@ -203,12 +203,12 @@
                             <ul class="side-list">
                                 <li><span>1</span><p>원본 CSV 행은 그대로 유지됩니다.</p></li>
                                 <li><span>2</span><p>파생된 <code>host</code> 컬럼이 추가됩니다.</p></li>
-                                <li><span>3</span><p>후속 필터링을 위해 IP와 GCP 플래그가 함께 붙습니다.</p></li>
+                                <li><span>3</span><p>IP와 GCP 플래그가 함께 추가됩니다.</p></li>
                             </ul>
                         </div>
                         <div class="side-card side-card-accent">
                             <span class="intro-card-tag">추천 활용</span>
-                            <p>대규모 파트너 URL 점검, 클라우드 라우팅 검증, 전달용 네트워크 근거 자료 준비에 특히 잘 맞습니다.</p>
+                            <p>대규모 URL 점검이나 전달용 네트워크 정리 작업에 적합합니다.</p>
                         </div>
                     </aside>
                 </div>
